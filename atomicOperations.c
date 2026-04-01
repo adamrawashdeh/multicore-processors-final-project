@@ -6,14 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int parse(const char *s) {
-    if (strcmp(s, "atomic") == 0) return 0;
-    if (strcmp(s, "critical") == 0) return 1;
-    if (strcmp(s, "reduction") == 0) return 2;
-
-    fprintf(stderr, "Invalid mode: %s\n", s);
-    exit(EXIT_FAILURE);
-}
 
 int main(int argc, const char *argv[]) {
     if (argc != 4) {
@@ -22,7 +14,22 @@ int main(int argc, const char *argv[]) {
     }
 
     long long iterations = atoll(argv[1]);
-    int mode = parse(argv[2]);
+    const char* mode;
+
+    if (strcmp(argv[2], "atomic") == 0) {
+        mode = "atomic";
+    }
+    else if (strcmp(argv[2], "critical") == 0) {
+        mode = "critical";
+    }
+    else if (strcmp(argv[2], "reduction") == 0) {
+        mode = "reduction";
+    }
+    else {
+        fprintf(stderr, "Invalid mode");
+        return EXIT_FAILURE;
+    }
+
     int threads = atoi(argv[3]);
 
     if (iterations <= 0 || threads <= 0) {
@@ -35,7 +42,7 @@ int main(int argc, const char *argv[]) {
     long long counter = 0;
     double start = omp_get_wtime();
 
-    if (mode == 2) {
+    if (strcmp(mode, "reduction") == 0) {
         long long sum = 0;
 
         #pragma omp parallel for reduction(+:sum) schedule(static)
@@ -44,26 +51,20 @@ int main(int argc, const char *argv[]) {
         }
 
         counter = sum;
-    } else if (mode == 0) {
-        #pragma omp parallel
-        {
-            #pragma omp for schedule(static)
-            for (long long i = 0; i < iterations; i++) {
-                #pragma omp atomic
-                counter += 1;
-            }
+    } else if (strcmp(mode, "atomic") == 0) {
+        #pragma omp parallel for schedule(static) 
+        for (long long i = 0; i < iterations; i++) {
+            #pragma omp atomic
+            counter += 1;
         }
     } else {
-        #pragma omp parallel
-        {
-            #pragma omp for schedule(static)
+        #pragma omp parallel for schedule(static)  
             for (long long i = 0; i < iterations; i++) {
                 #pragma omp critical
                 {
                     counter += 1;
                 }
             }
-        }
     }
 
     double end = omp_get_wtime();
@@ -73,6 +74,6 @@ int main(int argc, const char *argv[]) {
     printf("iterations=%lld\n", iterations);
     printf("result=%lld\n", counter);
     printf("time=%f\n", end - start);
-
+    
     return 0;
 }
