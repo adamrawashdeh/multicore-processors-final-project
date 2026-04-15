@@ -4,7 +4,7 @@ gcc -O3 -fopenmp primeCounting.c -lm -o primeCounting
 
 RUNS=5
 THREADS=(1 2 4 8 16 32 64)
-INPUT_SIZES=(100000 1000000 10000000 100000000)
+INPUT_SIZES=(100000 1000000 10000000)
 
 measure_avg_time() {
     local n=$1
@@ -19,7 +19,7 @@ measure_avg_time() {
             output=$(OMP_NUM_THREADS=$threads ./primeCounting "$n" 1)
         fi
 
-	time=$(echo "$output" | awk '/Time =/ {print $(NF-1)}')
+        time=$(echo "$output" | awk '/Time =/ {print $(NF-1)}')
         sum=$(echo "$sum + $time" | bc -l)
     done
 
@@ -41,7 +41,7 @@ run_benchmark() {
             printf "%-10d %-15s %-15s %-15s\n" "$t" "$n" "$avg" "$speedup"
         done
 
-	echo ""
+        echo ""
     done
 }
 

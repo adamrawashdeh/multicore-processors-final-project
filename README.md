@@ -3,7 +3,7 @@ PRIME COUNTING BENCHMARK: SEQUENTIAL, OPENMP, AND PERFORMANCE ANALYSIS
 -------------------------------------------------------------------------------
 
 This directory contains a C implementation of a compute-bound prime counting 
-benchmark and a comprehensive automation script for performance profiling.
+benchmark and an automation script for performance profiling.
 
 FILES:
 - primeCounting.c : Combined sequential and OpenMP implementation for counting primes.
@@ -45,14 +45,14 @@ two arguments:
 2. mode  : Execution mode (0 = sequential, 1 = OpenMP)
 
 RUNNING THE SEQUENTIAL VERSION:
-./primeCounting 100000000 0
-./primeCounting 50000000 0
+./primeCounting 10000000 0
+./primeCounting 5000000 0
 
 RUNNING THE OPENMP VERSION:
 # Set threads before running
 export OMP_NUM_THREADS=4
-./primeCounting 100000000 1
-./primeCounting 200000000 1
+./primeCounting 10000000 1
+./primeCounting 20000000 1
 
 -------------------------------------------------------------------------------
 4. AUTOMATED PROFILING (run_tests.sh)
@@ -72,7 +72,7 @@ The script performs the following:
 * Computes the average runtime for each run.
 * Uses the sequential version as the baseline for speedup calculation.
 * Evaluates performance for input sizes:
-  (100,000, 1,000,000, 10,000,000, 100,000,000)
+  (100,000, 1,000,000, 10,000,000)
 * Tests thread counts:
   (1, 2, 4, 8, 16, 32, 64)
 
